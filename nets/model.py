@@ -71,7 +71,7 @@ def model(images, outputs = 6, weight_decay=1e-5, is_training=True):
     images = mean_image_subtraction(images)
 
     with slim.arg_scope(resnet_v1.resnet_arg_scope(weight_decay=weight_decay)):
-        logits, end_points = resnet_v1.resnet_v1_50(images, is_training=is_training, scope='resnet_v1_50')
+        logits, end_points = resnet_v1.resnet_v1_101(images, is_training=is_training, scope='resnet_v1_101')
 
     #no non-linearities in FPN article
     feature_pyramid = build_feature_pyramid(end_points, weight_decay=weight_decay)

@@ -1,3 +1,4 @@
+import gc
 import time
 import numpy as np
 import tensorflow as tf
@@ -135,8 +136,10 @@ def main(argv=None):
             ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
             logger.debug(ckpt)
             saver.restore(sess, ckpt)
+            actual_step = int(global_step.eval(session=sess)+1)
         else:
             sess.run(init)
+            actual_step = 0
             if FLAGS.pretrained_model_path is not None:
                 variable_restore_op(sess)
 
@@ -145,7 +148,8 @@ def main(argv=None):
                                                  batch_size=FLAGS.batch_size_per_gpu * len(gpus))
 
         start = time.time()
-        for step in range(FLAGS.max_steps):
+        gc.collect()
+        for step in range(actual_step, FLAGS.max_steps):
             data = next(data_generator)
             ml, tl, _ = sess.run([model_loss, total_loss, train_op], feed_dict={input_images: data[0],
                                                                                 input_seg_maps: data[2],
